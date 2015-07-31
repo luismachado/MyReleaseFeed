@@ -7,4 +7,9 @@ $(document.body).on('click', '#tabAll', function(){
 
 $('#myModal').on('hidden.bs.modal', function (e) {
   angular.element(document.getElementById('id_test')).scope().saveConfig();
-})
+});
+
+// Avoid page jumping down when clicking on a tab
+$('.nav-pills li a').click( function(e) {
+	e.preventDefault();
+});
