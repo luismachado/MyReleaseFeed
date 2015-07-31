@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<base href="/">
+
+		<title>My Release Feed</title>
+
+		<!-- CSS -->
+		<link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.min.css">
+		<link rel="stylesheet" href="libs/ng-tags-input/ng-tags-input.min.css">
+		<link rel="stylesheet" href="libs/ng-tags-input/ng-tags-input.bootstrap.min.css">
+		<link rel="stylesheet" href="css/style.css"> <!-- custom styles -->
+
+		<!-- JS -->
+		<script src="libs/angular/angular.min.js"></script>
+		<script src="libs/angular-route/angular-route.min.js"></script>
+		<script src="libs/jquery/dist/jquery.min.js"></script>
+		<script src="libs/bootstrap/dist/js/bootstrap.min.js"></script>
+		<script src="libs/bootstrap/js/tab.js"></script>
+		<script type="text/javascript" src="libs/ng-tags-input/ng-tags-input.min.js"></script>
+
+		<!-- ANGULAR CUSTOM -->
+		<script src="js/controllers/ReleasesCtrl.js"></script>
+		<script src="js/services/ReleasesService.js"></script>
+		<script src="js/appRoutes.js"></script>
+		<script src="js/app.js"></script>
+
+
+		<!-- FavIcon -->
+		<link rel="icon" type="image/png" href="/imgs/glyphicons-365-cloud-upload.png">
+	</head>
+	<body id="id_test" ng-app="sampleApp" ng-controller="ReleasesController">
+		<div class="container" id="generalContainer">
+			
+			<!-- HEADER -->
+			<nav class="navbar navbar-inverse">
+				<div class="navbar-header">
+					<a class="navbar-brand" href="/MyReleaseFeed">MyReleaseFeed</a>
+				</div>
+				<div class="nav navbar-nav navbar-center time"> 
+					<b style="color:#9d9d9d">{{timeDiff}}</b>
+			    </div>
+				<div class="nav navbar-nav navbar-right checkbox"> 
+					<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">
+  						Filter Configuration
+					</button>
+			    </div>
+			</nav>
+
+			<!-- Modal -->
+			<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+			  <div class="modal-dialog" role="document">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+			        <h4 class="modal-title" id="myModalLabel">Filter Configuration</h4>
+			      </div>
+			      <div class="modal-body">
+						<div class="row">
+					  		<div class="col-md-4 filterTitle">
+					  			<label>
+						    		<input type="checkbox" ng-model="filterConfig.on" name="my-checkbox"/>
+						    		<b style="color:#9d9d9d"> Highlight results? </b>
+						    	</label>	
+					  		</div>
+					  		<div class="col-md-8">
+					  			 <button type="button" class="btn btn-danger cleanButton" ng-click="cleanFilters()">Erase All</button>	
+					  		</div>
+						</div>
+						<div class="row">
+							<div class="col-md-2 filterTitle">All:</div>
+							<div class="col-md-10">
+								<tags-input ng-model="filterConfig.all"></tags-input>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-2 filterTitle">Movies:</div>
+							<div class="col-md-10">
+								<tags-input ng-model="filterConfig.movies"></tags-input>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-2 filterTitle">TV Shows:</div>
+							<div class="col-md-10">
+								<tags-input ng-model="filterConfig.tvshows"></tags-input>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-2 filterTitle">Games:</div>
+							<div class="col-md-10">
+								<tags-input ng-model="filterConfig.games"></tags-input>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-2 filterTitle">Music:</div>
+							<div class="col-md-10">
+								<tags-input ng-model="filterConfig.music"></tags-input>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-2 filterTitle">Apps:</div>
+							<div class="col-md-10">
+								<tags-input ng-model="filterConfig.apps"></tags-input>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-2 filterTitle">eBooks:</div>
+							<div class="col-md-10">
+								<tags-input ng-model="filterConfig.ebooks"></tags-input>
+							</div>
+						</div>
+						<div class="row highlightNewItems">
+					  		<div class="col-md-12">
+					  			<label>
+						    		<input type="checkbox" ng-model="latestRelease.on" name="my-checkbox-latest"/>
+						    		<b style="color:#9d9d9d"> Highlight new items since last visit?</b>
+						    	</label>	
+					  		</div>
+						</div>
+			      </div>
+
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-default" ng-click="saveConfig()" data-dismiss="modal">Close</button>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+
+			
+			<div class="jumbotron text-center" ng-show="loading">
+				<div>
+					<img src="/imgs/load2.gif" class="img-responsive center-block" alt="Loading">
+					<h3>Loading...</h3>
+				</div>
+			</div>
+			<div class="jumbotron text-center" ng-show="error">
+				<div>
+					<h3>Nothing to see here :( Please come back later!</h3>
+				</div>
+			</div>
+			<div class="jumbotron" ng-hide="loading || error" id="releaseTabs">
+				<ul class="nav nav-pills">
+		  			<li>
+		  				<a id="tabAll" data-toggle="tab" ng-click="showHeaders()">All</a>
+		  			</li>
+		  			<li class = "active" class="item ng-class:{'disabled': movieList.length == 0};">
+		  				<a href="#movies" data-toggle="tab" ng-click="hideHeaders()">Movies</a>
+		  			</li>
+		  			<li class="item ng-class:{'disabled': showsList.length == 0};">
+		  				<a href="#tvshows" data-toggle="tab" ng-click="hideHeaders()">TV Shows</a>
+		  			</li>
+		  			<li class="item ng-class:{'disabled': musicList.length == 0};">
+		  				<a href="#music" data-toggle="tab" ng-click="hideHeaders()">Music</a>
+		  			</li>
+		  			<li class="item ng-class:{'disabled': gameList.length == 0};">
+		  				<a href="#games" data-toggle="tab" ng-click="hideHeaders()">Games</a>
+		  			</li>
+		  			<li class="item ng-class:{'disabled': appList.length == 0};">
+		  				<a href="#apps" data-toggle="tab" ng-click="hideHeaders()">Apps</a>
+		  			</li>
+		  			<li class="item ng-class:{'disabled': ebookList.length == 0};">
+		  				<a href="#ebooks" data-toggle="tab" ng-click="hideHeaders()">eBooks</a>
+		  			</li>
+				</ul>
+				
+				<div id="releasesContent" class="tab-content">
+					<h3 class="releaseHeaders" ng-show="visibleHeaders">Movies</h3>
+		        	<div class="tab-pane active" id="movies">
+						<table class="table">
+						    <thead>
+						    	<tr>
+						    		<th>Name</th>
+						    		<th>Download Links</th>
+					  			</tr>
+						    </thead>
+						    <tbody align="left">
+								<tr class="item ng-class:{'info': movie.highlight,'danger' : movie.filterOut};"
+								ng-hide="movie.filterOut && filter" 
+								ng-repeat="movie in movieList">
+									<td>
+										<span class="glyphicon glyphicon-star" ng-show="movie.newItem" aria-hidden="true"></span>
+										<a ng-href="{{movie.url}}" target="_blank"/>{{movie.title}}</a>
+									</td>
+									<td><a ng-href="{{movie.url_download}}" target="_blank"/>.torrent</a></td>
+								</tr>
+						    </tbody>
+					 	</table>
+					</div>	 
+
+					<div class="tab-pane" id="tvshows">
+						<h3 class="releaseHeaders" ng-show="visibleHeaders">TV Shows</h3>
+				 		<table class="table">
+						    <thead>
+						    	<tr>
+						    		<th>Name</th>
+						    		<th>Download Links</th>
+					  			</tr>
+						    </thead>
+						    <tbody align="left">
+								<tr class="item ng-class:{'info': tvshow.highlight,'danger' : tvshow.filterOut};"
+								ng-hide="tvshow.filterOut && filter" 
+								ng-repeat="tvshow in showsList">
+									<td>
+										<span class="glyphicon glyphicon-star" ng-show="tvshow.newItem" aria-hidden="true"></span>
+										<a ng-href="{{tvshow.url}}" target="_blank"/>{{tvshow.title}}</a>
+									</td>
+									<td><a ng-href="{{tvshow.url_download}}" target="_blank"/>.torrent</a></td>
+								</tr>
+						    </tbody>
+					 	</table>
+					</div>	
+
+				 	<div class="tab-pane" id="music">
+				 		<h3 class="releaseHeaders" ng-show="visibleHeaders">Music</h3>
+					 	<table class="table">
+						    <thead>
+						    	<tr>
+						    		<th>Name</th>
+						    		<th>Download Links</th>
+					  			</tr>
+						    </thead>
+						    <tbody align="left">
+								<tr class="item ng-class:{'info': music.highlight,'danger' : music.filterOut};"
+								ng-hide="music.filterOut && filter" 
+								ng-repeat="music in musicList">
+									<td>
+										<span class="glyphicon glyphicon-star" ng-show="music.newItem" aria-hidden="true"></span>
+										<a ng-href="{{music.url}}" target="_blank"/>{{music.title}}</a>
+									</td>
+									<td><a ng-href="{{music.url_download}}" target="_blank"/>.torrent</a></td>
+								</tr>
+							</tbody>
+					 	</table>
+					</div>
+
+					<div class="tab-pane" id="games">
+						<h3 class="releaseHeaders" ng-show="visibleHeaders">Games</h3>
+					 	<table class="table">
+						    <thead>
+						    	<tr>
+						    		<th>Name</th>
+						    		<th>Download Links</th>
+					  			</tr>
+						    </thead>
+						    <tbody align="left">
+								<tr class="item ng-class:{'info': game.highlight,'danger' : game.filterOut};"
+								ng-hide="game.filterOut && filter" 
+								ng-repeat="game in gameList">
+									<td>
+										<span class="glyphicon glyphicon-star" ng-show="game.newItem" aria-hidden="true"></span>
+										<a ng-href="{{game.url}}" target="_blank"/>{{game.title}}</a>
+									</td>
+									<td><a ng-href="{{game.url_download}}" target="_blank"/>.torrent</a></td>
+								</tr>
+						    </tbody>
+					 	</table>
+					</div>
+
+				 	<div class="tab-pane" id="apps">
+				 		<h3 class="releaseHeaders" ng-show="visibleHeaders">Apps</h3>
+					 	<table class="table">
+						    <thead>
+						    	<tr>
+						    		<th>Name</th>
+						    		<th>Download Links</th>
+					  			</tr>
+						    </thead>
+						    <tbody align="left">
+								<tr class="item ng-class:{'info': app.highlight,'danger' : app.filterOut};"
+								ng-hide="app.filterOut && filter" 
+								ng-repeat="app in appList">
+									<td>
+										<span class="glyphicon glyphicon-star" ng-show="app.newItem" aria-hidden="true"></span>
+										<a ng-href="{{app.url}}" target="_blank"/> {{app.title}}</a>
+									</td>
+									<td><a ng-href="{{app.url_download}}" target="_blank"/>.torrent</a></td>
+								</tr>
+						    </tbody>
+					 	</table>
+					</div>		 	
+
+				 	<div class="tab-pane" id="ebooks">
+				 		<h3 class="releaseHeaders" ng-show="visibleHeaders">eBooks</h3>
+					 	<table class="table">
+						    <thead>
+						    	<tr>
+						    		<th>Name</th>
+						    		<th>Download Links</th>
+					  			</tr>
+						    </thead>
+						    <tbody align="left">
+								<tr class="item ng-class:{'info': ebook.highlight,'danger' : ebook.filterOut};"
+								ng-hide="ebook.filterOut && filter" 
+								ng-repeat="ebook in ebookList">
+									<td>
+										<span class="glyphicon glyphicon-star" ng-show="ebook.newItem" aria-hidden="true"></span>
+										<a ng-href="{{ebook.url}}" target="_blank"/>{{ebook.title}}</a>
+									</td>
+									<td><a ng-href="{{ebook.url_download}}" target="_blank"/>.torrent</a></td>
+								</tr>
+						    </tbody>
+					 	</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="js/releases.js"></script>
+		<div id="footer">
+  			<div class="container">
+    			<p class="text-muted text-center">2015 © Luis Machado</p>
+  			</div>
+		</div>
+	</body>
+</html>
