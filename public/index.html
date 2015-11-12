@@ -145,22 +145,34 @@
 		  				<a id="tabAll" data-toggle="tab" ng-click="showHeaders()">All</a>
 		  			</li>
 		  			<li class = "active" class="item ng-class:{'disabled': movieList.length == 0};">
-		  				<a href="#movies" data-toggle="tab" ng-click="hideHeaders()">Movies</a>
+		  				<a href="#movies" data-toggle="tab" ng-click="hideHeaders()">Movies
+		  					<div id='noti-count' ng-show="movieHighlightCount"><div>{{movieHighlightCount}}</div></div>
+		  				</a>
 		  			</li>
 		  			<li class="item ng-class:{'disabled': showsList.length == 0};">
-		  				<a href="#tvshows" data-toggle="tab" ng-click="hideHeaders()">TV Shows</a>
+		  				<a href="#tvshows" data-toggle="tab" ng-click="hideHeaders()">TV Shows
+		  					<div id='noti-count' ng-show="showsHighlightCount"><div>{{showsHighlightCount}}</div></div>
+		  				</a>
 		  			</li>
 		  			<li class="item ng-class:{'disabled': musicList.length == 0};">
-		  				<a href="#music" data-toggle="tab" ng-click="hideHeaders()">Music</a>
+		  				<a href="#music" data-toggle="tab" ng-click="hideHeaders()">Music
+		  					<div id='noti-count' ng-show="musicHighlightCount"><div>{{musicHighlightCount}}</div></div>
+		  				</a>
 		  			</li>
 		  			<li class="item ng-class:{'disabled': gameList.length == 0};">
-		  				<a href="#games" data-toggle="tab" ng-click="hideHeaders()">Games</a>
+		  				<a href="#games" data-toggle="tab" ng-click="hideHeaders()">Games
+		  					<div id='noti-count' ng-show="gameHighlightCount"><div>{{gameHighlightCount}}</div></div>
+		  				</a>
 		  			</li>
 		  			<li class="item ng-class:{'disabled': appList.length == 0};">
-		  				<a href="#apps" data-toggle="tab" ng-click="hideHeaders()">Apps</a>
+		  				<a href="#apps" data-toggle="tab" ng-click="hideHeaders()">Apps
+		  					<div id='noti-count' ng-show="appHighlightCount"><div>{{appHighlightCount}}</div></div>
+		  				</a>
 		  			</li>
 		  			<li class="item ng-class:{'disabled': ebookList.length == 0};">
-		  				<a href="#ebooks" data-toggle="tab" ng-click="hideHeaders()">eBooks</a>
+		  				<a href="#ebooks" data-toggle="tab" ng-click="hideHeaders()">eBooks
+		  					<div id='noti-count' ng-show="ebookHighlightCount"><div>{{ebookHighlightCount}}</div></div>
+		  				</a>
 		  			</li>
 				</ul>
 				

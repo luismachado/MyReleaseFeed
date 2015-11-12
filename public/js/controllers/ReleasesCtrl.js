@@ -71,32 +71,49 @@ angular.module('ReleasesCtrl', ['ngTagsInput']).controller('ReleasesController',
 
 	var highlightItems = function(releases, filterConfig, latestRelease) {
 
-		$scope.movieList = highlightItemsPerType(releases.Movies, filterConfig.on, filterConfig.movies, filterConfig.all, latestRelease.on, latestRelease.movies);
-		$scope.showsList = highlightItemsPerType(releases.TVShows, filterConfig.on, filterConfig.tvshows, filterConfig.all, latestRelease.on, latestRelease.tvshows);
-		$scope.musicList = highlightItemsPerType(releases.Music, filterConfig.on, filterConfig.music, filterConfig.all, latestRelease.on, latestRelease.music);
-		$scope.gameList  = highlightItemsPerType(releases.Games, filterConfig.on, filterConfig.games, filterConfig.all, latestRelease.on, latestRelease.games);
-		$scope.appList   = highlightItemsPerType(releases.Apps, filterConfig.on, filterConfig.apps, filterConfig.all, latestRelease.on, latestRelease.apps);
-		$scope.ebookList = highlightItemsPerType(releases.eBooks, filterConfig.on, filterConfig.ebooks, filterConfig.all, latestRelease.on, latestRelease.ebooks);	
+		var highlightReturn = highlightItemsPerType(releases.Movies, filterConfig.on, filterConfig.movies, filterConfig.all, latestRelease.on, latestRelease.movies);
+		$scope.movieList = highlightReturn.list;
+		$scope.movieHighlightCount = highlightReturn.counter;
+		highlightReturn = highlightItemsPerType(releases.TVShows, filterConfig.on, filterConfig.tvshows, filterConfig.all, latestRelease.on, latestRelease.tvshows);
+		$scope.showsList = highlightReturn.list;
+		$scope.showsHighlightCount = highlightReturn.counter;
+		highlightReturn = highlightItemsPerType(releases.Music, filterConfig.on, filterConfig.music, filterConfig.all, latestRelease.on, latestRelease.music);
+		$scope.musicList = highlightReturn.list;
+		$scope.musicHighlightCount = highlightReturn.counter;
+		highlightReturn = highlightItemsPerType(releases.Games, filterConfig.on, filterConfig.games, filterConfig.all, latestRelease.on, latestRelease.games);
+		$scope.gameList  = highlightReturn.list;
+		$scope.gameHighlightCount = highlightReturn.counter;
+		highlightReturn = highlightItemsPerType(releases.Apps, filterConfig.on, filterConfig.apps, filterConfig.all, latestRelease.on, latestRelease.apps);
+		$scope.appList   = highlightReturn.list;
+		$scope.appHighlightCount = highlightReturn.counter;
+		highlightReturn = highlightItemsPerType(releases.eBooks, filterConfig.on, filterConfig.ebooks, filterConfig.all, latestRelease.on, latestRelease.ebooks);	
+		$scope.ebookList = highlightReturn.list;
+		$scope.ebookHighlightCount = highlightReturn.counter;
 	}
 
 	var highlightItemsPerType = function(list, toFilter, specificFilters, generalFilters, highlightLatestRelease, latestRelease) {
 		var stillNew = true;
+		var highlightCounter = 0;
 		for(var listIdx = 0; listIdx < list.length; listIdx++) {
 			list[listIdx].highlight = false;
 			for(var filtersIdx = 0; filtersIdx < specificFilters.length && toFilter; filtersIdx++) {
-				if(list[listIdx].title.indexOf(specificFilters[filtersIdx].text) != -1)
+				if(list[listIdx].title.indexOf(specificFilters[filtersIdx].text) != -1) {
 					list[listIdx].highlight = true;
+					highlightCounter++;
+				}
 			}
 			for(var filtersIdx = 0; filtersIdx < generalFilters.length && toFilter; filtersIdx++) {
-				if(list[listIdx].title.indexOf(generalFilters[filtersIdx].text) != -1)
+				if(list[listIdx].title.indexOf(generalFilters[filtersIdx].text) != -1) {
 					list[listIdx].highlight = true;
+					highlightCounter++;
+				}
 			}
 			if(stillNew && highlightLatestRelease && latestRelease && list[listIdx].title != latestRelease)
 				list[listIdx].newItem = true;
 			else
 				stillNew = false;
 		}
-		return list;
+		return {list : list, counter : highlightCounter };
 	}
 
 
